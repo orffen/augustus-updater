@@ -8,7 +8,10 @@ package main
 
 import (
 	"fmt"
+	"io"
+	"net/http"
 	"os"
+	"regexp"
 	"strings"
 )
 
@@ -16,6 +19,28 @@ const (
 	updateURL   = "https://josecadete.net/"
 	versionFile = "download_url.txt"
 )
+
+func getDownloadURL() (string, error) {
+	resp, err := http.Get(updateURL)
+	if err != nil {
+		return "", fmt.Errorf("failed to fetch %v: %w", updateURL, err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return "", fmt.Errorf("bad server response from %v: %w", updateURL, err)
+	}
+	bodyBytes, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return "", fmt.Errorf("couldn't read page body from %v: %w", updateURL, err)
+	}
+	htmlContent := string(bodyBytes)
+	rex := regexp.MustCompile(regex)
+	matches := rex.FindStringSubmatch(htmlContent)
+	if len(matches) < 1 {
+		return "", fmt.Errorf("couldn't find filename to match regex %v", regex)
+	}
+	return updateURL + matches[1], nil
+}
 
 func localVersion() (string, error) {
 	ver, err := os.ReadFile(versionFile)
