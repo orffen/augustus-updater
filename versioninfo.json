@@ -1,0 +1,9 @@
+{
+    "StringFileInfo": {
+        "FileDescription": "Augustus Unstable version updater",
+        "OriginalFilename": "augustus-updater.exe",
+        "ProductName": "Augustus Updater",
+        "LegalCopyright": "Copyright (c) 2026 Steve Simenic. Licensed under AGPLv3."
+    },
+    "ManifestPath": "augustus-updater.manifest"
+}

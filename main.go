@@ -2,6 +2,8 @@
 // Use of this source code is governed by a GNU AGPLv3 license
 // that can be found in the LICENSE file.
 
+//go:generate goversioninfo
+
 // Package main provides the main execution logic for the Augustus updater,
 // a utility to download the latest Augustus unstable build and run it.
 package main
