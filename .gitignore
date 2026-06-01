@@ -1,0 +1,6 @@
+# Compiled Windows resources
+resource.syso
+
+# Compiled binaries
+*.exe
+augustus-updater
