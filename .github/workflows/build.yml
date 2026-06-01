@@ -17,19 +17,22 @@ jobs:
           - goos: windows
             goarch: amd64
             binary_name: augustus-updater.exe
-          - goos: linux
-            goarch: amd64
-            binary_name: augustus-updater-linux-amd64
-          - goos: linux
-            goarch: arm64
-            binary_name: augustus-updater-linux-arm64
+            cgo: "1"
+#          - goos: linux
+#            goarch: amd64
+#            binary_name: augustus-updater-linux-amd64
+#            cgo: "0"
+#          - goos: linux
+#            goarch: arm64
+#            binary_name: augustus-updater-linux-arm64
+#            cgo: "0"
 
     steps:
     - name: Checkout Source Code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
 
     - name: Set up Go Toolchain
-      uses: actions/setup-go@v5
+      uses: actions/setup-go@v6
       with:
         go-version: '1.26'
         cache: true
@@ -40,18 +43,18 @@ jobs:
 
     - name: Run Code Generation (Windows Only)
       if: matrix.goos == 'windows'
-      run: go generate ./...
+      run: $(go env GOPATH)/bin/goversioninfo
 
     - name: Compile Binary
       env:
         GOOS: ${{ matrix.goos }}
         GOARCH: ${{ matrix.goarch }}
-        CGO_ENABLED: 0
+        CGO_ENABLED: ${{ matrix.cgo }}
       run: |
-        go build -v -ldflags="-s -w" -o build/${{ matrix.binary_name }}
+        go build -v -ldflags="-s -w" -o build/${{ matrix.binary_name }} .
 
     - name: Upload Build Artifacts
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: ${{ matrix.binary_name }}
         path: build/${{ matrix.binary_name }}
@@ -59,13 +62,14 @@ jobs:
   # Job 2: Compiles both Mac slices and stitches them together into a Universal Binary
   build-macos-universal:
     name: Build for macOS (Universal Binary)
+    if: false # disable this build until ready
     runs-on: macos-latest # Required to use Apple's native 'lipo' command line utility
     steps:
     - name: Checkout Source Code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
 
     - name: Set up Go Toolchain
-      uses: actions/setup-go@v5
+      uses: actions/setup-go@v6
       with:
         go-version: '1.26'
         cache: true
@@ -90,7 +94,7 @@ jobs:
         lipo -create build/updater-intel build/updater-arm64 -output build/dist/augustus-updater-mac
 
     - name: Upload Universal Mac Artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: augustus-updater-mac
         path: build/dist/augustus-updater-mac
