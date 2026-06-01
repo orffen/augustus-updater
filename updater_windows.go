@@ -15,10 +15,11 @@ import (
 	"os/exec"
 	"strings"
 	"syscall"
+	"time"
 )
 
 const (
-	exe     = "augustus.exe"
+	exe     = "./augustus.exe"
 	regex   = `href="([^"]+windows\.zip)"`
 	zipFile = "temp.zip"
 )
@@ -79,11 +80,13 @@ func applyUpdate(url string) error {
 
 func runProgram() {
 	cmd := exec.Command(exe)
+	cmd.Dir = "."
 	// CREATE_NEW_PROCESS_GROUP = 0x00000200
 	// DETACHED_PROCESS = 0x00000008
 	cmd.SysProcAttr = &syscall.SysProcAttr{
 		CreationFlags: 0x00000200 | 0x00000008,
 	}
 	_ = cmd.Start()
+	time.Sleep(100 * time.Millisecond)
 	os.Exit(0)
 }
