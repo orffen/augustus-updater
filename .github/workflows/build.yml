@@ -1,0 +1,96 @@
+name: Compile Cross-Platform Binaries
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  # Job 1: Compiles Windows and Linux assets on an Ubuntu runner
+  build-linux-windows:
+    name: Build for ${{ matrix.goos }} (${{ matrix.goarch }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - goos: windows
+            goarch: amd64
+            binary_name: augustus-updater.exe
+          - goos: linux
+            goarch: amd64
+            binary_name: augustus-updater-linux-amd64
+          - goos: linux
+            goarch: arm64
+            binary_name: augustus-updater-linux-arm64
+
+    steps:
+    - name: Checkout Source Code
+      uses: actions/checkout@v4
+
+    - name: Set up Go Toolchain
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.26'
+        cache: true
+
+    - name: Install goversioninfo (Windows Only)
+      if: matrix.goos == 'windows'
+      run: go install github.com/josephspurrier/goversioninfo/cmd/goversioninfo@latest
+
+    - name: Run Code Generation (Windows Only)
+      if: matrix.goos == 'windows'
+      run: go generate ./...
+
+    - name: Compile Binary
+      env:
+        GOOS: ${{ matrix.goos }}
+        GOARCH: ${{ matrix.goarch }}
+        CGO_ENABLED: 0
+      run: |
+        go build -v -ldflags="-s -w" -o build/${{ matrix.binary_name }}
+
+    - name: Upload Build Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ matrix.binary_name }}
+        path: build/${{ matrix.binary_name }}
+
+  # Job 2: Compiles both Mac slices and stitches them together into a Universal Binary
+  build-macos-universal:
+    name: Build for macOS (Universal Binary)
+    runs-on: macos-latest # Required to use Apple's native 'lipo' command line utility
+    steps:
+    - name: Checkout Source Code
+      uses: actions/checkout@v4
+
+    - name: Set up Go Toolchain
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.26'
+        cache: true
+
+    - name: Compile Intel Slice (amd64)
+      env:
+        GOOS: darwin
+        GOARCH: amd64
+        CGO_ENABLED: 0
+      run: go build -v -ldflags="-s -w" -o build/updater-intel
+
+    - name: Compile Apple Silicon Slice (arm64)
+      env:
+        GOOS: darwin
+        GOARCH: arm64
+        CGO_ENABLED: 0
+      run: go build -v -ldflags="-s -w" -o build/updater-arm64
+
+    - name: Stitch Slices into Universal Binary
+      run: |
+        mkdir -p build/dist
+        lipo -create build/updater-intel build/updater-arm64 -output build/dist/augustus-updater-mac
+
+    - name: Upload Universal Mac Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: augustus-updater-mac
+        path: build/dist/augustus-updater-mac
