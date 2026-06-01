@@ -2,15 +2,11 @@
 // Use of this source code is governed by a GNU AGPLv3 license
 // that can be found in the LICENSE file.
 
-// Package main implements the platform-specific update process
-// for Windows.
 package main
 
 import (
 	"archive/zip"
 	"fmt"
-	"io"
-	"net/http"
 	"os"
 	"os/exec"
 	"strings"
@@ -21,40 +17,8 @@ import (
 const (
 	exe     = "./augustus.exe"
 	regex   = `href="([^"]+windows\.zip)"`
-	zipFile = "temp.zip"
+	outFile = "temp.zip"
 )
-
-func downloadUpdate(url string) error {
-	resp, err := http.Get(url)
-	if err != nil {
-		return fmt.Errorf("download failed: %w", err)
-	}
-	defer func() { _ = resp.Body.Close() }()
-	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("bad server response from %s: %s", url, resp.Status)
-	}
-	out, err := os.Create(zipFile)
-	if err != nil {
-		return fmt.Errorf("couldn't create temp file %v: %w", zipFile, err)
-	}
-	defer func() { _ = out.Close() }()
-	if _, err := io.Copy(out, resp.Body); err != nil {
-		return fmt.Errorf("failed to save download: %w", err)
-	}
-	return nil
-}
-
-func unzip(file string) error {
-	r, err := zip.OpenReader(file)
-	if err != nil {
-		return fmt.Errorf("couldn't open zip %v: %w", file, err)
-	}
-	defer func() { _ = r.Close() }()
-	if err := os.CopyFS(".", r); err != nil {
-		return fmt.Errorf("couldn't extract zip %v: %w", file, err)
-	}
-	return nil
-}
 
 func applyUpdate(url string) error {
 	var err error
@@ -63,16 +27,16 @@ func applyUpdate(url string) error {
 		"windows", "development",
 	)
 	assetsURL := replacer.Replace(url)
-	defer func() { _ = os.Remove(zipFile) }()
+	defer func() { _ = os.Remove(outFile) }()
 	for _, u := range []string{url, assetsURL} {
-		if err = downloadUpdate(u); err != nil {
+		if err = downloadUpdate(u, outFile); err != nil {
 			return err
 		}
-		if err = unzip(zipFile); err != nil {
+		if err = unzip(outFile); err != nil {
 			return err
 		}
-		if err = os.Remove(zipFile); err != nil {
-			return fmt.Errorf("couldn't remove temporary file %v: %w", zipFile, err)
+		if err = os.Remove(outFile); err != nil {
+			return fmt.Errorf("couldn't remove temporary file %v: %w", outFile, err)
 		}
 	}
 	return nil
@@ -89,4 +53,16 @@ func runProgram() {
 	_ = cmd.Start()
 	time.Sleep(100 * time.Millisecond)
 	os.Exit(0)
+}
+
+func unzip(file string) error {
+	r, err := zip.OpenReader(file)
+	if err != nil {
+		return fmt.Errorf("couldn't open zip %v: %w", file, err)
+	}
+	defer func() { _ = r.Close() }()
+	if err := os.CopyFS(".", r); err != nil {
+		return fmt.Errorf("couldn't extract zip %v: %w", file, err)
+	}
+	return nil
 }
