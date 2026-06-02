@@ -21,12 +21,15 @@ func main() {
 		}
 	} else {
 		if lastURL != url {
+			fmt.Println("Updating, please wait...")
 			if err := applyUpdate(url); err != nil {
 				fatalError("Couldn't apply update:", err)
 			}
 			if err := writeVersion(url); err != nil {
 				showError("Couldn't write local version:", err)
 			}
+		} else {
+			fmt.Println("Already up-to-date.")
 		}
 	}
 	runProgram()
