@@ -8,7 +8,6 @@ package main
 
 import (
 	"fmt"
-	"os"
 )
 
 func main() {
@@ -16,26 +15,20 @@ func main() {
 	var lastURL string
 	var url string
 
-	lastURL, err = localVersion()
-	if err != nil {
+	if lastURL, err = localVersion(); err != nil {
 		fmt.Println("Couldn't read local version:", err)
 	}
-	url, err = getDownloadURL(regex)
-	if err != nil {
+	if url, err = getDownloadURL(regex); err != nil {
 		fmt.Println("Error:", err)
 		if lastURL == "" {
-			fmt.Println("Fatal Error: No current version installed and unable to download latest.")
-			os.Exit(1)
+			fatalError("Fatal Error: No current version installed and unable to download latest.")
 		}
 	} else {
 		if lastURL != url {
-			err = applyUpdate(url)
-			if err != nil {
-				fmt.Println("Fatal Error applying update:", err)
-				os.Exit(1)
+			if err = applyUpdate(url); err != nil {
+				fatalError("Fatal Error applying update:", err)
 			}
-			err = writeVersion(url)
-			if err != nil {
+			if err = writeVersion(url); err != nil {
 				fmt.Println("Couldn't write local version:", err)
 			}
 		}

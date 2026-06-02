@@ -38,6 +38,14 @@ func downloadUpdate(url string, filename string) error {
 	return nil
 }
 
+func fatalError(v ...any) {
+	fmt.Print("Fatal Error: ")
+	fmt.Println(v...)
+	fmt.Println("Press ENTER key to quit...")
+	_, _ = fmt.Scanln()
+	os.Exit(1)
+}
+
 func getDownloadURL(regex string) (string, error) {
 	resp, err := http.Get(updateURL)
 	if err != nil {
