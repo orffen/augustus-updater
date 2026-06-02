@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	dstAppName = "Augustus Unstable.app"
+	dstApp     = "Augustus Unstable.app"
 	mountPoint = "/Volumes/AugustusUnstable"
 	outFile    = "temp.dmg"
 	regex      = `href="([^"]+mac\.dmg)"`
@@ -29,7 +29,7 @@ func init() {
 	if err != nil {
 		fatalError(fmt.Errorf("couldn't find home directory: %w", err))
 	}
-	appLocation = filepath.Join(home, "Applications", dstAppName)
+	appLocation = filepath.Join(home, "Applications", dstApp)
 }
 
 func applyUpdate(url string) error {
