@@ -22,8 +22,8 @@ import (
 
 const (
 	exe     = "./augustus.exe"
-	regex   = `href="([^"]+windows-64bit\.zip)"`
 	outFile = "temp.zip"
+	regex   = `href="([^"]+windows-64bit\.zip)"`
 )
 
 func applyUpdate(urlStr string) error {
