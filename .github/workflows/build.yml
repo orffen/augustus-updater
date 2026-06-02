@@ -2,9 +2,8 @@ name: Compile Cross-Platform Binaries
 
 on:
   push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+    tags:
+      - 'v*'
 
 jobs:
   # Job 1: Compiles Windows and Linux assets on an Ubuntu runner
@@ -97,3 +96,33 @@ jobs:
       with:
         name: augustus-updater-mac
         path: build/dist/augustus-updater-mac
+
+  # Job 3: Downloads all artifacts and publishes them to a Release
+  publish-release:
+    name: Publish Release Assets
+    needs: [build-linux-windows, build-macos-universal]
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download All Artifacts
+        uses: actions/download-artifact@v8
+        with:
+          path: release-assets
+          merge-multiple: true
+
+      - name: Create Release and Upload Assets
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: Augustus Updater ${{ github.ref_name }}
+          body: |
+            Automated cross-platform binaries for version ${{ github.ref_name }}
+            Commit: ${{ github.sha }}
+          draft: false
+          prerelease: false
+          files: release-assets/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
