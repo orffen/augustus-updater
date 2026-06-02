@@ -3,4 +3,5 @@ resource.syso
 
 # Compiled binaries
 *.exe
-augustus-updater
+augustus-updater-mac
+augustus-updater-linux*
