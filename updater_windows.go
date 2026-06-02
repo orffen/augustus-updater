@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
+	"net/url"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -25,22 +26,26 @@ const (
 	outFile = "temp.zip"
 )
 
-func applyUpdate(url string) error {
+func applyUpdate(urlStr string) error {
+	assetsURL, err := url.Parse(urlStr)
+	if err != nil {
+		return fmt.Errorf("invalid update url: %w", err)
+	}
 	replacer := strings.NewReplacer(
 		"augustus", "assets",
 		"windows", "development",
 		"-64bit", "",
 	)
-	assetsURL := replacer.Replace(url)
+	assetsURL.Path = replacer.Replace(assetsURL.Path)
 	defer func() { _ = os.Remove(outFile) }()
-	for _, u := range []string{url, assetsURL} {
-		if err := downloadUpdate(u, outFile); err != nil {
+	for _, u := range []string{urlStr, assetsURL.String()} {
+		if err = downloadUpdate(u, outFile); err != nil {
 			return err
 		}
-		if err := unzip(outFile); err != nil {
+		if err = unzip(outFile); err != nil {
 			return err
 		}
-		if err := os.Remove(outFile); err != nil {
+		if err = os.Remove(outFile); err != nil {
 			return fmt.Errorf("couldn't remove temporary file %v: %w", outFile, err)
 		}
 	}
