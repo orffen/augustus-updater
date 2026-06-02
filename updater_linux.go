@@ -20,6 +20,7 @@ const (
 )
 
 func applyUpdate(url string) error {
+	defer func() { _ = os.Remove(outFile) }()
 	if err := downloadUpdate(url, outFile); err != nil {
 		return err
 	}
@@ -30,9 +31,6 @@ func applyUpdate(url string) error {
 	if err := os.Rename(outFile, exe); err != nil {
 		_ = os.Remove(outFile)
 		return fmt.Errorf("couldn't deploy new AppImage: %w", err)
-	}
-	if err := os.Remove(outFile); err != nil {
-		return fmt.Errorf("couldn't remove temporary file %v: %w", outFile, err)
 	}
 	return nil
 }
