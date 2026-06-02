@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	updateURL   = "https://josecadete.net/"
+	updateURL   = "https://augustus.josecadete.net/"
 	versionFile = "download_url.txt"
 )
 

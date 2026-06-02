@@ -11,24 +11,21 @@ import (
 )
 
 func main() {
-	var err error
-	var lastURL string
-	var url string
-
-	if lastURL, err = localVersion(); err != nil {
+	lastURL, err := localVersion()
+	if err != nil {
 		fmt.Println("Couldn't read local version:", err)
 	}
-	if url, err = getDownloadURL(regex); err != nil {
+	if url, err := getDownloadURL(regex); err != nil {
 		fmt.Println("Error:", err)
 		if lastURL == "" {
 			fatalError("Fatal Error: No current version installed and unable to download latest.")
 		}
 	} else {
 		if lastURL != url {
-			if err = applyUpdate(url); err != nil {
+			if err := applyUpdate(url); err != nil {
 				fatalError("Fatal Error applying update:", err)
 			}
-			if err = writeVersion(url); err != nil {
+			if err := writeVersion(url); err != nil {
 				fmt.Println("Couldn't write local version:", err)
 			}
 		}
