@@ -18,10 +18,10 @@ jobs:
             goarch: amd64
             binary_name: augustus-updater.exe
             cgo: "1"
-#          - goos: linux
-#            goarch: amd64
-#            binary_name: augustus-updater-linux-amd64
-#            cgo: "0"
+          - goos: linux
+            goarch: amd64
+            binary_name: augustus-updater-linux-amd64
+            cgo: "0"
 #          - goos: linux
 #            goarch: arm64
 #            binary_name: augustus-updater-linux-arm64
