@@ -30,6 +30,16 @@ func init() {
 		fatalError(fmt.Errorf("couldn't find home directory: %w", err))
 	}
 	appLocation = filepath.Join(home, "Applications", dstApp)
+	// change to the true CWD before executing
+	execPath, err := os.Executable()
+	if err != nil {
+		return
+	}
+	realPath, err := filepath.EvalSymlinks(execPath)
+	if err != nil {
+		return
+	}
+	_ = os.Chdir(filepath.Dir(realPath))
 }
 
 func applyUpdate(url string) error {
