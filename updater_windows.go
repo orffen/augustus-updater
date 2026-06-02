@@ -13,6 +13,7 @@ import (
 	"io/fs"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 	"syscall"
 	"time"
@@ -25,7 +26,6 @@ const (
 )
 
 func applyUpdate(url string) error {
-	var err error
 	replacer := strings.NewReplacer(
 		"augustus", "assets",
 		"windows", "development",
@@ -34,13 +34,13 @@ func applyUpdate(url string) error {
 	assetsURL := replacer.Replace(url)
 	defer func() { _ = os.Remove(outFile) }()
 	for _, u := range []string{url, assetsURL} {
-		if err = downloadUpdate(u, outFile); err != nil {
+		if err := downloadUpdate(u, outFile); err != nil {
 			return err
 		}
-		if err = unzip(outFile); err != nil {
+		if err := unzip(outFile); err != nil {
 			return err
 		}
-		if err = os.Remove(outFile); err != nil {
+		if err := os.Remove(outFile); err != nil {
 			return fmt.Errorf("couldn't remove temporary file %v: %w", outFile, err)
 		}
 	}
@@ -70,20 +70,21 @@ func unzip(file string) error {
 		if err != nil || path == "." {
 			return err
 		}
-		if d.IsDir() {
+		if d.IsDir() { // handle empty directories
 			return os.MkdirAll(path, 0755)
+		}
+		if err := os.MkdirAll(filepath.Dir(path), 0755); err != nil {
+			return err
 		}
 		src, err := r.Open(path)
 		if err != nil {
 			return err
 		}
-		defer src.Close()
-		dst, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
+		defer func() { _ = src.Close() }()
+		data, err := io.ReadAll(src)
 		if err != nil {
 			return err
 		}
-		defer dst.Close()
-		_, err = io.Copy(dst, src)
-		return err
+		return os.WriteFile(path, data, 0644)
 	})
 }
