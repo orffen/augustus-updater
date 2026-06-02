@@ -82,7 +82,8 @@ func localVersion() (string, error) {
 }
 
 func showError(v ...any) {
-	fmt.Fprintln(os.Stderr, v...)
+	args := append([]any{"Warning:"}, v...)
+	fmt.Fprintln(os.Stderr, args)
 }
 
 func writeVersion(ver string) error {

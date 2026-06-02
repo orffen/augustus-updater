@@ -6,20 +6,23 @@
 // a utility to download the latest Augustus unstable build and run it.
 package main
 
+import "fmt"
+
 func main() {
+	fmt.Println("Augustus Updater checking for latest unstable version...")
 	lastURL, err := localVersion()
 	if err != nil {
 		showError("Couldn't read local version:", err)
 	}
 	if url, err := getDownloadURL(regex); err != nil {
-		showError("Error:", err)
+		showError("Couldn't find download URL:", err)
 		if lastURL == "" {
-			fatalError("Fatal Error: No current version installed and unable to download latest.")
+			fatalError("No current version installed and unable to download latest.")
 		}
 	} else {
 		if lastURL != url {
 			if err := applyUpdate(url); err != nil {
-				fatalError("Fatal Error applying update:", err)
+				fatalError("Couldn't apply update:", err)
 			}
 			if err := writeVersion(url); err != nil {
 				showError("Couldn't write local version:", err)
