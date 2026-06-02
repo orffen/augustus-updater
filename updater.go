@@ -5,6 +5,7 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"io"
 	"net/http"
@@ -39,10 +40,11 @@ func downloadUpdate(url string, filename string) error {
 }
 
 func fatalError(v ...any) {
-	fmt.Print("Fatal Error: ")
-	fmt.Println(v...)
+	args := append([]any{"Fatal Error:"}, v...)
+	fmt.Fprintln(os.Stderr, args...)
 	fmt.Println("Press ENTER key to quit...")
-	_, _ = fmt.Scanln()
+	reader := bufio.NewScanner(os.Stdin)
+	_ = reader.Scan()
 	os.Exit(1)
 }
 
@@ -77,6 +79,10 @@ func localVersion() (string, error) {
 		return "", fmt.Errorf("local version file unreadable: %w", err)
 	}
 	return strings.TrimSpace(string(ver)), nil
+}
+
+func showError(v ...any) {
+	fmt.Fprintln(os.Stderr, v...)
 }
 
 func writeVersion(ver string) error {
