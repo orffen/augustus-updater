@@ -9,6 +9,8 @@ package main
 import (
 	"archive/zip"
 	"fmt"
+	"io"
+	"io/fs"
 	"os"
 	"os/exec"
 	"strings"
@@ -18,7 +20,7 @@ import (
 
 const (
 	exe     = "./augustus.exe"
-	regex   = `href="([^"]+windows\.zip)"`
+	regex   = `href="([^"]+windows-64bit\.zip)"`
 	outFile = "temp.zip"
 )
 
@@ -27,6 +29,7 @@ func applyUpdate(url string) error {
 	replacer := strings.NewReplacer(
 		"augustus", "assets",
 		"windows", "development",
+		"-64bit", "",
 	)
 	assetsURL := replacer.Replace(url)
 	defer func() { _ = os.Remove(outFile) }()
@@ -63,8 +66,24 @@ func unzip(file string) error {
 		return fmt.Errorf("couldn't open zip %v: %w", file, err)
 	}
 	defer func() { _ = r.Close() }()
-	if err := os.CopyFS(".", r); err != nil {
-		return fmt.Errorf("couldn't extract zip %v: %w", file, err)
-	}
-	return nil
+	return fs.WalkDir(r, ".", func(path string, d fs.DirEntry, err error) error {
+		if err != nil || path == "." {
+			return err
+		}
+		if d.IsDir() {
+			return os.MkdirAll(path, 0755)
+		}
+		src, err := r.Open(path)
+		if err != nil {
+			return err
+		}
+		defer src.Close()
+		dst, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
+		if err != nil {
+			return err
+		}
+		defer dst.Close()
+		_, err = io.Copy(dst, src)
+		return err
+	})
 }
