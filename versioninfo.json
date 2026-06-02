@@ -3,7 +3,8 @@
         "FileDescription": "Augustus Unstable version updater",
         "OriginalFilename": "augustus-updater.exe",
         "ProductName": "Augustus Updater",
-        "LegalCopyright": "Copyright (c) 2026 Steve Simenic. Licensed under AGPLv3."
+        "LegalCopyright": "Copyright (c) 2026 Steve Simenic. Licensed under AGPLv3. App icon (c) Augustus developers under AGPLv3."
     },
+    "IconPath": "augustus-updater.ico",
     "ManifestPath": "augustus-updater.manifest"
 }
