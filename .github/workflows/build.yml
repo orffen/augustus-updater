@@ -30,7 +30,7 @@ jobs:
     - name: Checkout Source Code
       uses: actions/checkout@v6
 
-    - name: Set up Go Toolchain
+    - name: Setup Go Toolchain
       uses: actions/setup-go@v6
       with:
         go-version: '1.26'
@@ -66,7 +66,7 @@ jobs:
     - name: Checkout Source Code
       uses: actions/checkout@v6
 
-    - name: Set up Go Toolchain
+    - name: Setup Go Toolchain
       uses: actions/setup-go@v6
       with:
         go-version: '1.26'
