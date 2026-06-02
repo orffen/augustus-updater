@@ -1,6 +1,8 @@
 # Augustus Updater
 
-The Augustus Updater is a simple utility to automatically check for and download the latest [Augustus Unstable](https://josecadete.net/) build for your platform before running Augustus.
+[![Compile Cross-Platform Binaries](https://github.com/orffen/augustus-updater/actions/workflows/build.yml/badge.svg)](https://github.com/orffen/augustus-updater/actions/workflows/build.yml)
+
+The Augustus Updater is a simple utility to automatically check for and download the latest [Augustus Unstable](https://augustus.josecadete.net/) build for your platform before running Augustus.
 
 It currently supports Windows (64bit), MacOS (Universal) and Linux (AppImage), and will automatically execute Augustus Unstable after updating.
 
@@ -14,4 +16,4 @@ Note that on MacOS, you may need to modify its permissions to allow it to execut
 
 ## License
 
-This project is licensed under the GNU Affero General Public License v3 (AGPLv3). See the `LICENSE.txt` file for the full text layout.
+This project is licensed under the GNU Affero General Public License v3 (AGPLv3). See the `LICENSE.txt` file for the full license text.
