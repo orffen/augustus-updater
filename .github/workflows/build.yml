@@ -62,7 +62,6 @@ jobs:
   # Job 2: Compiles both Mac slices and stitches them together into a Universal Binary
   build-macos-universal:
     name: Build for macOS (Universal Binary)
-    if: false # disable this build until ready
     runs-on: macos-latest # Required to use Apple's native 'lipo' command line utility
     steps:
     - name: Checkout Source Code
