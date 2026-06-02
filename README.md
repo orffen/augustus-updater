@@ -10,7 +10,7 @@ On Windows and Linux, it will download to the current directory. You can run it 
 
 On MacOS, it will always download to `~/Applications/Augustus Unstable.app`.
 
-Note that on MacOS, you may need to modify its permissions to allow it to execute, as Unstable Augustus builds are not signed. You can do this by running `sudo xattr -d com.apple.quarantine ~/Applications/Augustus Unstable.app`.
+Note that on MacOS, you may need to modify its permissions to allow it to execute, as Augustus Updater is not signed. You can do this by running `xattr -d com.apple.quarantine augustus-updater-mac`.
 
 ## License
 

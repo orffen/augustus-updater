@@ -61,6 +61,7 @@ func installFromDMG(dmgFile string) error {
 	if err := copyCmd.Run(); err != nil {
 		return fmt.Errorf("couldn't copy app: %v", err)
 	}
+	_ = exec.Command("xattr", "-d", "-r", "-s", "com.apple.quarantine", appLocation).Run() // GateKeeper for Augustus Unstable
 	return nil
 }
 
