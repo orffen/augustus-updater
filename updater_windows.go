@@ -99,24 +99,31 @@ func unzip(ctx context.Context, file string) error {
 		if err != nil || path == "." {
 			return err
 		}
-		if err := ctx.Err(); err != nil {
-			return fmt.Errorf("unzip aborted: %w", err)
-		}
 		if d.IsDir() { // handle empty directories
 			return os.MkdirAll(path, 0755)
 		}
 		if err := os.MkdirAll(filepath.Dir(path), 0755); err != nil {
 			return err
 		}
+		if err := ctx.Err(); err != nil {
+			return fmt.Errorf("unzip aborted: %w", err)
+		}
 		src, err := r.Open(path)
 		if err != nil {
 			return err
 		}
-		defer func() { _ = src.Close() }()
-		data, err := io.ReadAll(src)
+		dst, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
 		if err != nil {
+			_ = src.Close()
 			return err
 		}
-		return os.WriteFile(path, data, 0644)
+		_, err = io.Copy(dst, src)
+		// cleanup first
+		_ = dst.Close()
+		_ = src.Close()
+		if err != nil { // io.Copy error
+			return err
+		}
+		return nil
 	})
 }
