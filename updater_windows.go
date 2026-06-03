@@ -16,18 +16,19 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"sync"
 	"syscall"
 	"time"
 )
 
 const (
 	exe     = "./augustus.exe"
-	outFile = "update.zip"
+	outFile = "update%d.zip"
 	regex   = `href="([^"]+windows-64bit\.zip)"`
 )
 
-func applyUpdate(urlStr string) error {
-	assetsURL, err := url.Parse(urlStr)
+func applyUpdate(updateURL string) error {
+	assetsURL, err := url.Parse(updateURL)
 	if err != nil {
 		return fmt.Errorf("invalid update url: %w", err)
 	}
@@ -37,16 +38,38 @@ func applyUpdate(urlStr string) error {
 		"-64bit", "",
 	)
 	assetsURL.Path = replacer.Replace(assetsURL.Path)
-	defer func() { _ = os.Remove(outFile) }()
-	for _, u := range []string{urlStr, assetsURL.String()} {
-		if err = downloadUpdate(u, outFile); err != nil {
+	urls := []string{updateURL, assetsURL.String()}
+
+	var downloadWG sync.WaitGroup
+	var unzipWG sync.WaitGroup
+	errChan := make(chan error, len(urls))
+
+	for i, u := range urls {
+		downloadWG.Add(1)
+		unzipWG.Add(1)
+		file := fmt.Sprintf(outFile, i)
+		go func(downloadURL, file string) {
+			defer unzipWG.Done()
+			defer func() { _ = os.Remove(file) }()
+			if err := downloadUpdate(downloadURL, file); err != nil {
+				errChan <- err
+				downloadWG.Done()
+				return
+			}
+			downloadWG.Done()
+			downloadWG.Wait()
+			if err := unzip(file); err != nil {
+				errChan <- err
+				return
+			}
+		}(u, file)
+	}
+	unzipWG.Wait()
+	close(errChan)
+
+	for err := range errChan {
+		if err != nil {
 			return err
-		}
-		if err = unzip(outFile); err != nil {
-			return err
-		}
-		if err = os.Remove(outFile); err != nil {
-			return fmt.Errorf("couldn't remove temporary file %v: %w", outFile, err)
 		}
 	}
 	return nil
