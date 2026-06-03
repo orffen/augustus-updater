@@ -8,6 +8,7 @@ package main
 
 import (
 	"archive/zip"
+	"context"
 	"fmt"
 	"io"
 	"io/fs"
@@ -58,7 +59,7 @@ func applyUpdate(updateURL string) error {
 			}
 			downloadWG.Done()
 			downloadWG.Wait()
-			if err := unzip(file); err != nil {
+			if err := unzip(context.TODO(), file); err != nil {
 				errChan <- err
 				return
 			}
@@ -88,7 +89,7 @@ func runProgram() {
 	os.Exit(0)
 }
 
-func unzip(file string) error {
+func unzip(ctx context.Context, file string) error {
 	r, err := zip.OpenReader(file)
 	if err != nil {
 		return fmt.Errorf("couldn't open zip %v: %w", file, err)
@@ -97,6 +98,9 @@ func unzip(file string) error {
 	return fs.WalkDir(r, ".", func(path string, d fs.DirEntry, err error) error {
 		if err != nil || path == "." {
 			return err
+		}
+		if err := ctx.Err(); err != nil {
+			return fmt.Errorf("unzip aborted: %w", err)
 		}
 		if d.IsDir() { // handle empty directories
 			return os.MkdirAll(path, 0755)
