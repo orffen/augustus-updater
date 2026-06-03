@@ -22,7 +22,7 @@ import (
 
 const (
 	exe     = "./augustus.exe"
-	outFile = "temp.zip"
+	outFile = "update.zip"
 	regex   = `href="([^"]+windows-64bit\.zip)"`
 )
 
