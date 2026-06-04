@@ -17,7 +17,7 @@ import (
 
 const (
 	updateURL   = "https://augustus.josecadete.net/"
-	versionFile = "download_url.txt"
+	versionFile = "updater.txt"
 )
 
 func downloadUpdate(ctx context.Context, url string, filename string) error {
