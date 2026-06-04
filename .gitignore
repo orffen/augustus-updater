@@ -1,5 +1,6 @@
 # Compiled Windows resources
 resource.syso
+versioninfo.json
 
 # Compiled binaries
 *.exe
