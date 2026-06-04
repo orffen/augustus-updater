@@ -1,6 +1,6 @@
 # Augustus Updater <img src="assets/augustus-updater.png" alt="Augustus Updater" width="48" height="48">
 
-[![Compile Cross-Platform Binaries](https://github.com/orffen/augustus-updater/actions/workflows/build.yml/badge.svg)](https://github.com/orffen/augustus-updater/actions/workflows/build.yml)
+[![Build Augustus Updater](https://github.com/orffen/augustus-updater/actions/workflows/build.yml/badge.svg)](https://github.com/orffen/augustus-updater/actions/workflows/build.yml)
 
 The Augustus Updater is a simple utility to automatically check for and download the latest [Augustus Unstable](https://augustus.josecadete.net/) build for your platform before running it.
 
@@ -10,9 +10,9 @@ It currently supports Windows (64-bit), macOS (Universal) and Linux (AppImage), 
 
 | Platform | Latest release |
 | --- | :---: |
-| Windows 64-bit | [![Download Latest](https://img.shields.io/github/v/release/orffen/augustus-updater?label=Download%20for%20Windows)](https://github.com/orffen/augustus-updater/releases/latest/download/augustus-updater.exe) |
-| macOS | [![Download Latest](https://img.shields.io/github/v/release/orffen/augustus-updater?label=Download%20for%20macOS)](https://github.com/orffen/augustus-updater/releases/latest/download/augustus-updater-mac) |
-| Linux amd64 | [![Download Latest](https://img.shields.io/github/v/release/orffen/augustus-updater?label=Download%20for%20Linux%20amd64)](https://github.com/orffen/augustus-updater/releases/latest/download/augustus-updater-linux-amd64) |
+| Windows 64-bit | [![Download for Windows](https://img.shields.io/github/v/release/orffen/augustus-updater?label=Download%20for%20Windows)](https://github.com/orffen/augustus-updater/releases/latest/download/augustus-updater.exe) |
+| macOS | [![Download for macOS](https://img.shields.io/github/v/release/orffen/augustus-updater?label=Download%20for%20macOS)](https://github.com/orffen/augustus-updater/releases/latest/download/augustus-updater-mac) |
+| Linux amd64 | [![Download for Linux amd64](https://img.shields.io/github/v/release/orffen/augustus-updater?label=Download%20for%20Linux%20amd64)](https://github.com/orffen/augustus-updater/releases/latest/download/augustus-updater-linux-amd64) |
 
 On Windows and Linux, it will download to the current directory. You can run it from the same directory you want it to install Augustus Unstable into, or `cd` into the directory and run it from another location.
 

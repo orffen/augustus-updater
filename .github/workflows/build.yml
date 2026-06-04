@@ -1,4 +1,4 @@
-name: Compile Cross-Platform Binaries
+name: Build Augustus Updater
 
 on:
   push:
