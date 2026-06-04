@@ -6,7 +6,11 @@
 // a utility to download the latest Augustus unstable build and run it.
 package main
 
-import "fmt"
+import (
+	"bufio"
+	"fmt"
+	"os"
+)
 
 func main() {
 	fmt.Println("Augustus Updater checking for latest unstable version...")
@@ -33,4 +37,19 @@ func main() {
 		}
 	}
 	runProgram()
+}
+
+func showError(v ...any) {
+	args := append([]any{"Warning:"}, v...)
+	fmt.Fprintln(os.Stderr, args)
+}
+
+func fatalError(v ...any) {
+	args := append([]any{"Fatal Error:"}, v...)
+	_ = writeVersion(fmt.Sprintf("%s\nWill redownload when next run.", args)) // force a re-download next run
+	fmt.Fprintln(os.Stderr, args...)
+	fmt.Println("Press ENTER key to quit...")
+	reader := bufio.NewScanner(os.Stdin)
+	_ = reader.Scan()
+	os.Exit(1)
 }

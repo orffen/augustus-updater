@@ -5,54 +5,17 @@
 package main
 
 import (
-	"bufio"
 	"context"
 	"fmt"
 	"io"
 	"net/http"
 	"os"
 	"regexp"
-	"strings"
 )
 
 const (
-	updateURL   = "https://augustus.josecadete.net/"
-	versionFile = "updater.txt"
+	updateURL = "https://augustus.josecadete.net/"
 )
-
-func downloadUpdate(ctx context.Context, url string, filename string) error {
-	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
-	if err != nil {
-		return fmt.Errorf("failed to create request for %s: %w", url, err)
-	}
-	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return fmt.Errorf("download failed for %s: %w", url, err)
-	}
-	defer func() { _ = resp.Body.Close() }()
-	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("bad server response from %s: %s", url, resp.Status)
-	}
-	out, err := os.Create(filename)
-	if err != nil {
-		return fmt.Errorf("couldn't create temp file %v: %w", filename, err)
-	}
-	defer func() { _ = out.Close() }()
-	if _, err := io.Copy(out, resp.Body); err != nil {
-		return fmt.Errorf("failed to save download: %w", err)
-	}
-	return nil
-}
-
-func fatalError(v ...any) {
-	args := append([]any{"Fatal Error:"}, v...)
-	_ = writeVersion(fmt.Sprintf("%s\nWill redownload when next run.", args)) // force a re-download next run
-	fmt.Fprintln(os.Stderr, args...)
-	fmt.Println("Press ENTER key to quit...")
-	reader := bufio.NewScanner(os.Stdin)
-	_ = reader.Scan()
-	os.Exit(1)
-}
 
 func getDownloadURL(regex string) (string, error) {
 	resp, err := http.Get(updateURL)
@@ -76,23 +39,26 @@ func getDownloadURL(regex string) (string, error) {
 	return updateURL + matches[1], nil
 }
 
-func localVersion() (string, error) {
-	ver, err := os.ReadFile(versionFile)
+func downloadUpdate(ctx context.Context, url string, filename string) error {
+	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
 	if err != nil {
-		if os.IsNotExist(err) {
-			return "", nil
-		}
-		return "", fmt.Errorf("local version file unreadable: %w", err)
+		return fmt.Errorf("failed to create request for %s: %w", url, err)
 	}
-	return strings.TrimSpace(string(ver)), nil
-}
-
-func showError(v ...any) {
-	args := append([]any{"Warning:"}, v...)
-	fmt.Fprintln(os.Stderr, args)
-}
-
-func writeVersion(ver string) error {
-	data := []byte(ver)
-	return os.WriteFile(versionFile, data, 0644)
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return fmt.Errorf("download failed for %s: %w", url, err)
+	}
+	defer func() { _ = resp.Body.Close() }()
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("bad server response from %s: %s", url, resp.Status)
+	}
+	out, err := os.Create(filename)
+	if err != nil {
+		return fmt.Errorf("couldn't create temp file %v: %w", filename, err)
+	}
+	defer func() { _ = out.Close() }()
+	if _, err := io.Copy(out, resp.Body); err != nil {
+		return fmt.Errorf("failed to save download: %w", err)
+	}
+	return nil
 }
