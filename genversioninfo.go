@@ -63,5 +63,5 @@ func main() {
 
 	jsonData, _ := json.Marshal(verInfo)
 	_ = os.WriteFile("versioninfo.json", jsonData, 0644)
-	fmt.Printf("Wrote versioninfo.json for %s", ver)
+	fmt.Printf("Wrote versioninfo.json for %s\n", ver)
 }
