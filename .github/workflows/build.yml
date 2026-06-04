@@ -42,8 +42,9 @@ jobs:
       if: matrix.goos == 'windows'
       run: go install github.com/josephspurrier/goversioninfo/cmd/goversioninfo@latest
 
-    - name: Run Code Generation
-      run: go generate -v ./...
+    - name: Run Windows Code Generation
+      if: matrix.goos == 'windows'
+      run: go generate -v updater_windows.go
 
     - name: Compile Binary
       env:
