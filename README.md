@@ -1,4 +1,4 @@
-# Augustus Updater
+# Augustus Updater <img src="assets/augustus-updater.png" alt="Augustus Updater" width="48" height="48">
 
 [![Compile Cross-Platform Binaries](https://github.com/orffen/augustus-updater/actions/workflows/build.yml/badge.svg)](https://github.com/orffen/augustus-updater/actions/workflows/build.yml)
 
