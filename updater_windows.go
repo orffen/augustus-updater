@@ -13,9 +13,10 @@ import (
 	"os"
 	"os/exec"
 	"strings"
-	"sync"
 	"syscall"
 	"time"
+
+	"golang.org/x/sync/errgroup"
 )
 
 const (
@@ -36,40 +37,33 @@ func applyUpdate(updateURL string) error {
 	)
 	assetsURL.Path = replacer.Replace(assetsURL.Path)
 	urls := []string{updateURL, assetsURL.String()}
-
-	var downloadWG sync.WaitGroup
-	var unzipWG sync.WaitGroup
-	errChan := make(chan error, len(urls))
-
-	for i, u := range urls {
-		downloadWG.Add(1)
-		unzipWG.Add(1)
-		file := fmt.Sprintf(outFile, i)
-		go func(downloadURL, file string) {
-			defer unzipWG.Done()
-			defer func() { _ = os.Remove(file) }()
-			if err := downloadUpdate(downloadURL, file); err != nil {
-				errChan <- err
-				downloadWG.Done()
-				return
-			}
-			downloadWG.Done()
-			downloadWG.Wait()
-			if err := unzip(context.TODO(), file); err != nil {
-				errChan <- err
-				return
-			}
-		}(u, file)
+	files := make([]string, len(urls))
+	for i := range urls {
+		files[i] = fmt.Sprintf(outFile, i)
 	}
-	unzipWG.Wait()
-	close(errChan)
-
-	for err := range errChan {
-		if err != nil {
-			return err
+	defer func() {
+		for _, file := range files {
+			_ = os.Remove(file)
 		}
+	}()
+
+	dlGrp, dlCtx := errgroup.WithContext(context.Background())
+	for i, u := range urls {
+		dlGrp.Go(func() error {
+			return downloadUpdate(dlCtx, u, files[i])
+		})
 	}
-	return nil
+	if err := dlGrp.Wait(); err != nil {
+		return err
+	}
+
+	unzipGrp, unzipCtx := errgroup.WithContext(context.Background())
+	for _, file := range files {
+		unzipGrp.Go(func() error {
+			return unzip(unzipCtx, file)
+		})
+	}
+	return unzipGrp.Wait()
 }
 
 func runProgram() {

@@ -7,6 +7,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"os/exec"
@@ -21,7 +22,7 @@ const (
 
 func applyUpdate(url string) error {
 	defer func() { _ = os.Remove(outFile) }()
-	if err := downloadUpdate(url, outFile); err != nil {
+	if err := downloadUpdate(context.Background(), url, outFile); err != nil {
 		return err
 	}
 	if err := os.Chmod(outFile, 0755); err != nil {

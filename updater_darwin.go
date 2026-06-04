@@ -5,6 +5,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"os/exec"
@@ -43,7 +44,7 @@ func init() {
 }
 
 func applyUpdate(url string) error {
-	if err := downloadUpdate(url, outFile); err != nil {
+	if err := downloadUpdate(context.Background(), url, outFile); err != nil {
 		return err
 	}
 	if err := installFromDMG(outFile); err != nil {

@@ -23,10 +23,14 @@ const (
 	versionFile = "download_url.txt"
 )
 
-func downloadUpdate(url string, filename string) error {
-	resp, err := http.Get(url)
+func downloadUpdate(ctx context.Context, url string, filename string) error {
+	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
 	if err != nil {
-		return fmt.Errorf("download failed: %w", err)
+		return fmt.Errorf("failed to create request for %s: %w", url, err)
+	}
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return fmt.Errorf("download failed for %s: %w", url, err)
 	}
 	defer func() { _ = resp.Body.Close() }()
 	if resp.StatusCode != http.StatusOK {
