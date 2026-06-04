@@ -5,3 +5,7 @@ resource.syso
 *.exe
 augustus-updater-mac
 augustus-updater-linux*
+
+# OS-specific cruft
+.DS_Store
+Thumbs.db
