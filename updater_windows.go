@@ -7,15 +7,11 @@
 package main
 
 import (
-	"archive/zip"
 	"context"
 	"fmt"
-	"io"
-	"io/fs"
 	"net/url"
 	"os"
 	"os/exec"
-	"path/filepath"
 	"strings"
 	"sync"
 	"syscall"
@@ -87,43 +83,4 @@ func runProgram() {
 	_ = cmd.Start()
 	time.Sleep(100 * time.Millisecond)
 	os.Exit(0)
-}
-
-func unzip(ctx context.Context, file string) error {
-	r, err := zip.OpenReader(file)
-	if err != nil {
-		return fmt.Errorf("couldn't open zip %v: %w", file, err)
-	}
-	defer func() { _ = r.Close() }()
-	return fs.WalkDir(r, ".", func(path string, d fs.DirEntry, err error) error {
-		if err != nil || path == "." {
-			return err
-		}
-		if d.IsDir() { // handle empty directories
-			return os.MkdirAll(path, 0755)
-		}
-		if err := os.MkdirAll(filepath.Dir(path), 0755); err != nil {
-			return err
-		}
-		if err := ctx.Err(); err != nil {
-			return fmt.Errorf("unzip aborted: %w", err)
-		}
-		src, err := r.Open(path)
-		if err != nil {
-			return err
-		}
-		dst, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
-		if err != nil {
-			_ = src.Close()
-			return err
-		}
-		_, err = io.Copy(dst, src)
-		// cleanup first
-		_ = dst.Close()
-		_ = src.Close()
-		if err != nil { // io.Copy error
-			return err
-		}
-		return nil
-	})
 }
