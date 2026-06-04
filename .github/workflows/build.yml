@@ -43,7 +43,7 @@ jobs:
       run: go install github.com/josephspurrier/goversioninfo/cmd/goversioninfo@latest
 
     - name: Run Code Generation
-      run: go generate ./..
+      run: go generate ./...
 
     - name: Compile Binary
       env:
