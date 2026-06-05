@@ -1,12 +1,14 @@
-# Compiled Windows resources
+# OS resources
+Info.plist
 resource.syso
 versioninfo.json
 
 # Compiled binaries
 *.exe
-augustus-updater-mac
 augustus-updater-linux*
+augustus-updater-mac
 
 # OS-specific cruft
 .DS_Store
+.directory
 Thumbs.db
