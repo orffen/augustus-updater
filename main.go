@@ -61,7 +61,11 @@ func main() {
 			fmt.Println("Already up to date.")
 		}
 	}
-	runProgram()
+	if err := runProgram(); err != nil {
+		fatalError("Couldn't start Augustus Unstable: %w")
+	}
+	time.Sleep(100 * time.Millisecond)
+	os.Exit(0)
 }
 
 func showError(v ...any) {

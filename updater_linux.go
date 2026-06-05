@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"time"
 )
 
 const (
@@ -34,9 +33,10 @@ func applyUpdate(url string) error {
 	return nil
 }
 
-func runProgram() {
+func runProgram() error {
 	cmd := exec.Command("./" + exe)
-	_ = cmd.Start()
-	time.Sleep(100 * time.Millisecond)
-	os.Exit(0)
+	if err := cmd.Start(); err != nil {
+		return err
+	}
+	return nil
 }

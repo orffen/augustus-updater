@@ -12,14 +12,13 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"time"
 )
 
 const (
 	dstApp     = "Augustus Unstable.app"
 	mountPoint = "/Volumes/AugustusUnstable"
 	regex      = `href="([^"]+mac\.dmg)"`
-	srcAppName = "augustus.app"
+	srcApp     = "augustus.app"
 )
 
 var (
@@ -62,7 +61,7 @@ func installFromDMG(dmgFile string) error {
 		return fmt.Errorf("failed to mount DMG: %v", err)
 	}
 	defer func() { _ = exec.Command("hdiutil", "detach", mountPoint, "-quiet").Run() }()
-	src := filepath.Join(mountPoint, srcAppName)
+	src := filepath.Join(mountPoint, srcApp)
 	_ = os.RemoveAll(appLocation)
 	copyCmd := exec.Command("cp", "-R", src, appLocation) // rely on macOS utilities to preserve attributes
 	if err := copyCmd.Run(); err != nil {
@@ -72,9 +71,10 @@ func installFromDMG(dmgFile string) error {
 	return nil
 }
 
-func runProgram() {
+func runProgram() error {
 	cmd := exec.Command("open", appLocation)
-	_ = cmd.Start()
-	time.Sleep(100 * time.Millisecond)
-	os.Exit(0)
+	if err := cmd.Start(); err != nil {
+		return err
+	}
+	return nil
 }

@@ -19,7 +19,6 @@ import (
 	"path/filepath"
 	"strings"
 	"syscall"
-	"time"
 
 	"golang.org/x/sync/errgroup"
 )
@@ -71,7 +70,7 @@ func applyUpdate(updateURL string) error {
 	return unzipGrp.Wait()
 }
 
-func runProgram() {
+func runProgram() error {
 	cmd := exec.Command(exe)
 	cmd.Dir = "."
 	// CREATE_NEW_PROCESS_GROUP = 0x00000200
@@ -79,9 +78,11 @@ func runProgram() {
 	cmd.SysProcAttr = &syscall.SysProcAttr{
 		CreationFlags: 0x00000200 | 0x00000008,
 	}
-	_ = cmd.Start()
-	time.Sleep(100 * time.Millisecond)
-	os.Exit(0)
+	err := cmd.Start()
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func unzip(ctx context.Context, file string) error {
