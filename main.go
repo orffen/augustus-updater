@@ -12,8 +12,13 @@ import (
 	"os"
 )
 
+var (
+	version = "0.0.0-dev"
+)
+
 func main() {
-	fmt.Println("Augustus Updater checking for latest unstable version...")
+	fmt.Println("Augustus Updater", version)
+	fmt.Println("Checking for latest unstable version...")
 	lastURL, err := localVersion()
 	if err != nil {
 		showError("Couldn't read local version:", err)
