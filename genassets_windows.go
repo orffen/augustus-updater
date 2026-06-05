@@ -35,13 +35,14 @@ func main() {
 	ver := "0.0.0-dev" // fallback version string
 	major, minor, patch, build := 0, 0, 0, 0
 
-	cmd := exec.Command("git", "describe", "--always")
+	cmd := exec.Command("git", "describe", "--tags", "--abbrev=0")
 	if out, err := cmd.Output(); err == nil {
 		ver = strings.TrimSpace(string(out))
 		re := regexp.MustCompile(`v(\d+)\.(\d+)\.(\d+)`)
 		if matches := re.FindStringSubmatch(ver); len(matches) == 4 {
 			fmt.Sscanf(matches[1]+" "+matches[2]+" "+matches[3], "%d %d %d", &major, &minor, &patch)
 		}
+		ver = strings.TrimPrefix(ver, "v")
 	}
 
 	verInfo := VersionInfo{
@@ -54,8 +55,8 @@ func main() {
 			OriginalFilename: "augustus-updater.exe",
 			ProductName:      "Augustus Updater",
 			LegalCopyright:   "Copyright (c) 2026 Steve Simenic. Licensed under AGPLv3. App icon (c) Augustus developers under AGPLv3.",
-			FileVersion:      strings.TrimPrefix(ver, "v"),
-			ProductVersion:   strings.TrimPrefix(ver, "v"),
+			FileVersion:      ver,
+			ProductVersion:   ver,
 		},
 		IconPath:     "assets/augustus-updater.ico",
 		ManifestPath: "assets/augustus-updater.manifest",
