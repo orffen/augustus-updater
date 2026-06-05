@@ -2,7 +2,7 @@
 // Use of this source code is governed by a GNU AGPLv3 license
 // that can be found in the LICENSE file.
 
-//go:generate go run genversioninfo.go
+//go:generate go run genassets_windows.go
 //go:generate goversioninfo
 
 package main
