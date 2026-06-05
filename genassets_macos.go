@@ -42,6 +42,11 @@ const InfoPlistTemplate = `<?xml version="1.0" encoding="UTF-8"?>
 </plist>
 `
 
+const launcherScript = `#!/bin/sh
+DIR="$( cd "$( dirname "$0" )" && pwd )"
+osascript -e "tell application \"Terminal\" to do script \"exec '$DIR/augustus-updater-mac'\""
+`
+
 func main() {
 	ver := "0.0.0-dev" // fallback version string
 
@@ -51,7 +56,7 @@ func main() {
 	}
 
 	data := InfoPlistData{
-		BundleExecutable:       "augustus-updater-mac",
+		BundleExecutable:       "launcher",
 		BundleIdentifier:       "com.github.orffen.augustus-updater",
 		BundleVersion:          ver,
 		HumanReadableCopyright: "Copyright (c) 2026 Steve Simenic. Licensed under AGPLv3. App icon (c) Augustus developers under AGPLv3.",
@@ -75,4 +80,9 @@ func main() {
 		os.Exit(1)
 	}
 	fmt.Printf("Wrote Info.plist for %s\n", ver)
+	if err := os.WriteFile("launcher", []byte(launcherScript), 0755); err != nil {
+		fmt.Fprintf(os.Stderr, "Error creating launcher script: %v", err)
+		os.Exit(1)
+	}
+	fmt.Printf("Wrote launcher script for %s\n", ver)
 }

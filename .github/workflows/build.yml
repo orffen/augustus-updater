@@ -79,6 +79,9 @@ jobs:
         go-version: '1.26'
         cache: true
 
+    - name: Run macOS Code Generation
+      run: go generate -v updater_darwin.go
+
     - name: Compile Intel Slice (amd64)
       env:
         GOOS: darwin
@@ -98,11 +101,28 @@ jobs:
         mkdir -p build/dist
         lipo -create build/updater-intel build/updater-arm64 -output build/dist/augustus-updater-mac
 
+    - name: Create .app Bundle Structure
+      run: |
+        mkdir -p "Augustus Updater.app/Contents/MacOS"
+        mkdir -p "Augustus Updater.app/Contents/Resources"
+        mkdir -p "Augustus Updater.app/Contents/Helpers"
+        cp Info.plist "Augustus Updater.app/Contents/"
+        cp assets/augustus-updater.icns "Augustus Updater.app/Contents/Resources/"
+        cp launcher "Augustus Updater.app/Contents/MacOS/"
+        cp build/dist/augustus-updater-mac "Augustus Updater.app/Contents/MacOS/"
+        chmod +x "Augustus Updater.app/Contents/MacOS/launcher" "Augustus Updater.app/Contents/MacOS/augustus-updater-mac"
+
+    - name: Package DMG
+      run: |
+        mkdir dmg_staging
+        mv "Augustus Updater.app" dmg_staging/
+        hdiutil create -volname "Augustus Updater" -srcfolder dmg_staging -ov -format UDZO "build/dist/augustus-updater-mac.dmg"
+
     - name: Upload Universal Mac Artifact
       uses: actions/upload-artifact@v7
       with:
-        name: augustus-updater-mac
-        path: build/dist/augustus-updater-mac
+        name: augustus-updater-mac.dmg
+        path: build/dist/augustus-updater-mac.dmg
 
   # Job 3: Downloads all artifacts and publishes them to a Release
   publish-release:
