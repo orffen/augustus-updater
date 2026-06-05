@@ -16,7 +16,11 @@ import (
 )
 
 const (
-	updaterURL = "https://github.com/orffen/augustus-updater"
+	colourReset   = "\033[0m"  // ANSI reset
+	colourError   = "\033[31m" // ANSI red
+	colourUpdate  = "\033[32m" // ANSI green
+	colourWarning = "\033[33m" // ANSI yellow
+	updaterURL    = "https://github.com/orffen/augustus-updater"
 )
 
 var (
@@ -30,7 +34,7 @@ func main() {
 		showError("Couldn't check updater version:", err)
 	}
 	if semver.Compare(updaterVer, version) == 1 {
-		fmt.Println("New updater version", updaterVer, "is available! Download from", updaterURL)
+		fmt.Println(colourUpdate+"New updater version", updaterVer, "is available! Download from", updaterURL+colourReset)
 		time.Sleep(3 * time.Second)
 	}
 	fmt.Println("Checking for latest Augustus unstable version...")
@@ -61,14 +65,18 @@ func main() {
 
 func showError(v ...any) {
 	args := append([]any{"Warning:"}, v...)
+	fmt.Fprint(os.Stderr, colourWarning)
 	fmt.Fprintln(os.Stderr, args...)
+	fmt.Fprint(os.Stderr, colourReset)
 }
 
 func fatalError(v ...any) {
 	args := append([]any{"Fatal Error:"}, v...)
 	_ = writeVersion(fmt.Sprintf("%s\nWill redownload when next run.", args)) // force a re-download next run
+	fmt.Fprint(os.Stderr, colourError)
 	fmt.Fprintln(os.Stderr, args...)
 	fmt.Println("Press ENTER key to quit...")
+	fmt.Fprint(os.Stderr, colourReset)
 	reader := bufio.NewScanner(os.Stdin)
 	_ = reader.Scan()
 	os.Exit(1)
