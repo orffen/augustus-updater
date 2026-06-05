@@ -57,7 +57,7 @@ func main() {
 				showError("Couldn't write local version:", err)
 			}
 		} else {
-			fmt.Println("Already up-to-date.")
+			fmt.Println("Already up to date.")
 		}
 	}
 	runProgram()
