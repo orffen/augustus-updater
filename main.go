@@ -10,6 +10,13 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"time"
+
+	"golang.org/x/mod/semver"
+)
+
+const (
+	updaterURL = "https://github.com/orffen/augustus-updater"
 )
 
 var (
@@ -18,7 +25,15 @@ var (
 
 func main() {
 	fmt.Println("Augustus Updater", version)
-	fmt.Println("Checking for latest unstable version...")
+	updaterVer, err := latestUpdaterVersion()
+	if err != nil {
+		showError("Couldn't check updater version:", err)
+	}
+	if semver.Compare(updaterVer, version) == 1 {
+		fmt.Println("New updater version", updaterVer, "is available! Download from", updaterURL)
+		time.Sleep(3 * time.Second)
+	}
+	fmt.Println("Checking for latest Augustus unstable version...")
 	lastURL, err := localVersion()
 	if err != nil {
 		showError("Couldn't read local version:", err)
@@ -46,7 +61,7 @@ func main() {
 
 func showError(v ...any) {
 	args := append([]any{"Warning:"}, v...)
-	fmt.Fprintln(os.Stderr, args)
+	fmt.Fprintln(os.Stderr, args...)
 }
 
 func fatalError(v ...any) {

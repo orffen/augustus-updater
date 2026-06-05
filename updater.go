@@ -6,6 +6,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -14,8 +15,32 @@ import (
 )
 
 const (
-	updateURL = "https://augustus.josecadete.net/"
+	updateURL         = "https://augustus.josecadete.net/"
+	updaterVersionURL = "https://api.github.com/repos/orffen/augustus-updater/releases/latest"
+	userAgent         = "github.com/orffen/augustus-updater"
 )
+
+type GitHubRelease struct {
+	TagName string `json:"tag_name"`
+}
+
+func latestUpdaterVersion() (string, error) {
+	req, err := http.NewRequest("GET", updaterVersionURL, nil)
+	if err != nil {
+		return "", fmt.Errorf("failed to create request for %s: %w", updaterVersionURL, err)
+	}
+	req.Header.Set("User-Agent", userAgent+"/"+version)
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return "", fmt.Errorf("couldn't fetch %s: %w", updaterVersionURL, err)
+	}
+	defer func() { _ = resp.Body.Close() }()
+	var rel GitHubRelease
+	if err := json.NewDecoder(resp.Body).Decode(&rel); err != nil {
+		return "", fmt.Errorf("couldn't parse response: %w", err)
+	}
+	return rel.TagName, nil
+}
 
 func getDownloadURL(regex string) (string, error) {
 	resp, err := http.Get(updateURL)
