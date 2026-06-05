@@ -44,7 +44,7 @@ const InfoPlistTemplate = `<?xml version="1.0" encoding="UTF-8"?>
 
 const launcherScript = `#!/bin/sh
 DIR="$( cd "$( dirname "$0" )" && pwd )"
-osascript -e "tell application \"Terminal\" to do script \"exec '$DIR/augustus-updater-mac'\""
+open -a Terminal "$DIR/augustus-updater-mac"
 `
 
 func main() {
