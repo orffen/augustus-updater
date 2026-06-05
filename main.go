@@ -10,6 +10,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"strings"
 	"time"
 
 	"golang.org/x/mod/semver"
@@ -64,19 +65,19 @@ func main() {
 }
 
 func showError(v ...any) {
-	args := fmt.Sprintf("Warning: %s", fmt.Sprint(v...))
+	args := strings.TrimSpace(fmt.Sprintln(v...))
 	fmt.Fprint(os.Stderr, colourWarning)
-	fmt.Fprintln(os.Stderr, args)
+	fmt.Fprintln(os.Stderr, "Warning:", args)
 	fmt.Fprint(os.Stderr, colourReset)
 }
 
 func fatalError(v ...any) {
-	args := fmt.Sprintf("Fatal Error: %s", fmt.Sprint(v...))
-	_ = writeVersion(fmt.Sprintf("%s\nWill redownload when next run.", args)) // force a redownload next run
+	args := strings.TrimSpace(fmt.Sprintln(v...))
+	_ = writeVersion(fmt.Sprintf("Fatal Error: %s\nWill redownload when next run.", args)) // force a redownload next run
 	fmt.Fprint(os.Stderr, colourError)
-	fmt.Fprintln(os.Stderr, args)
-	fmt.Println("Press ENTER key to quit...")
+	fmt.Fprintln(os.Stderr, "Fatal Error:", args)
 	fmt.Fprint(os.Stderr, colourReset)
+	fmt.Println("Press ENTER key to quit...")
 	reader := bufio.NewScanner(os.Stdin)
 	_ = reader.Scan()
 	os.Exit(1)
