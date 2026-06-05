@@ -64,17 +64,17 @@ func main() {
 }
 
 func showError(v ...any) {
-	args := append([]any{"Warning:"}, v...)
+	args := fmt.Sprintf("Warning: %s", fmt.Sprint(v...))
 	fmt.Fprint(os.Stderr, colourWarning)
-	fmt.Fprintln(os.Stderr, args...)
+	fmt.Fprintln(os.Stderr, args)
 	fmt.Fprint(os.Stderr, colourReset)
 }
 
 func fatalError(v ...any) {
-	args := append([]any{"Fatal Error:"}, v...)
-	_ = writeVersion(fmt.Sprintf("%s\nWill redownload when next run.", args)) // force a re-download next run
+	args := fmt.Sprintf("Fatal Error: %s", fmt.Sprint(v...))
+	_ = writeVersion(fmt.Sprintf("%s\nWill redownload when next run.", args)) // force a redownload next run
 	fmt.Fprint(os.Stderr, colourError)
-	fmt.Fprintln(os.Stderr, args...)
+	fmt.Fprintln(os.Stderr, args)
 	fmt.Println("Press ENTER key to quit...")
 	fmt.Fprint(os.Stderr, colourReset)
 	reader := bufio.NewScanner(os.Stdin)
