@@ -70,21 +70,6 @@ func applyUpdate(updateURL string) error {
 	return unzipGrp.Wait()
 }
 
-func runProgram() error {
-	cmd := exec.Command(exe)
-	cmd.Dir = "."
-	// CREATE_NEW_PROCESS_GROUP = 0x00000200
-	// DETACHED_PROCESS = 0x00000008
-	cmd.SysProcAttr = &syscall.SysProcAttr{
-		CreationFlags: 0x00000200 | 0x00000008,
-	}
-	err := cmd.Start()
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
 func unzip(ctx context.Context, file string) error {
 	r, err := zip.OpenReader(file)
 	if err != nil {
@@ -122,4 +107,19 @@ func unzip(ctx context.Context, file string) error {
 		}
 		return nil
 	})
+}
+
+func runProgram() error {
+	cmd := exec.Command(exe)
+	cmd.Dir = "."
+	// CREATE_NEW_PROCESS_GROUP = 0x00000200
+	// DETACHED_PROCESS = 0x00000008
+	cmd.SysProcAttr = &syscall.SysProcAttr{
+		CreationFlags: 0x00000200 | 0x00000008,
+	}
+	err := cmd.Start()
+	if err != nil {
+		return err
+	}
+	return nil
 }
