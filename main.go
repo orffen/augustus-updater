@@ -62,7 +62,7 @@ func main() {
 		}
 	}
 	if err := runProgram(); err != nil {
-		fatalError("Couldn't start Augustus Unstable: %w")
+		fatalError("Couldn't start Augustus Unstable:", err)
 	}
 	time.Sleep(100 * time.Millisecond)
 	os.Exit(0)
