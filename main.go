@@ -17,11 +17,11 @@ import (
 )
 
 const (
-	colourReset   = "\033[0m"  // ANSI reset
-	colourError   = "\033[31m" // ANSI red
-	colourUpdate  = "\033[32m" // ANSI green
-	colourWarning = "\033[33m" // ANSI yellow
-	updaterURL    = "https://github.com/orffen/augustus-updater"
+	colorReset   = "\033[0m"  // ANSI reset
+	colorError   = "\033[31m" // ANSI red
+	colorUpdate  = "\033[32m" // ANSI green
+	colorWarning = "\033[33m" // ANSI yellow
+	updaterURL   = "https://github.com/orffen/augustus-updater"
 )
 
 var (
@@ -35,7 +35,7 @@ func main() {
 		showError("Couldn't check updater version:", err)
 	}
 	if semver.Compare(updaterVer, version) == 1 {
-		fmt.Println(colourUpdate+"New updater version", updaterVer, "is available! Download from", updaterURL+colourReset)
+		fmt.Println(colorUpdate+"New updater version", updaterVer, "is available! Download from", updaterURL+colorReset)
 		time.Sleep(3 * time.Second)
 	}
 	fmt.Println("Checking for latest Augustus unstable version...")
@@ -70,17 +70,17 @@ func main() {
 
 func showError(v ...any) {
 	args := strings.TrimSpace(fmt.Sprintln(v...))
-	fmt.Fprint(os.Stderr, colourWarning)
+	fmt.Fprint(os.Stderr, colorWarning)
 	fmt.Fprintln(os.Stderr, "Warning:", args)
-	fmt.Fprint(os.Stderr, colourReset)
+	fmt.Fprint(os.Stderr, colorReset)
 }
 
 func fatalError(v ...any) {
 	args := strings.TrimSpace(fmt.Sprintln(v...))
 	_ = writeVersion(fmt.Sprintf("Fatal Error: %s\nWill redownload when next run.", args)) // force a redownload next run
-	fmt.Fprint(os.Stderr, colourError)
+	fmt.Fprint(os.Stderr, colorError)
 	fmt.Fprintln(os.Stderr, "Fatal Error:", args)
-	fmt.Fprint(os.Stderr, colourReset)
+	fmt.Fprint(os.Stderr, colorReset)
 	fmt.Println("Press ENTER key to quit...")
 	reader := bufio.NewScanner(os.Stdin)
 	_ = reader.Scan()
