@@ -21,6 +21,8 @@ On macOS, it will store all of its files (including the `Augustus Unstable.app`)
 xattr -rd com.apple.quarantine "Augustus Updater.app"
 ```
 
+To force the updater to download a fresh copy of Augustus Unstable, simply delete `updater.txt`. This file will also contain the details of any fatal errors.
+
 ## License & Attribution
 
 This project is licensed under the GNU Affero General Public License v3 (AGPLv3). See the `LICENSE.txt` file for the full license text.
