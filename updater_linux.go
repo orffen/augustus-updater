@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"syscall"
 )
 
 const (
@@ -35,6 +36,9 @@ func applyUpdate(url string) error {
 
 func runProgram() error {
 	cmd := exec.Command("./" + exe)
+	cmd.SysProcAttr = &syscall.SysProcAttr{
+		Setsid: true,
+	}
 	if err := cmd.Start(); err != nil {
 		return err
 	}
